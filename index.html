@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine</title>
+  <style>
+    :root{
+      --pinkA:#ffe6f3;
+      --pinkB:#ff7fc4;
+      --pinkC:#ff4fb0;
+      --glass: rgba(255,255,255,0.58);
+      --shadow: rgba(0,0,0,0.18);
+      --text:#7a1449;
+    }
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      height:100vh;
+      overflow:hidden;
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 20%, var(--pinkA), var(--pinkB) 55%, var(--pinkC));
+      display:grid;
+      place-items:center;
+    }
+
+    /* Mosaic background of your couple photos */
+    #mosaic{
+      position:fixed;
+      inset:0;
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      grid-auto-rows: 120px;
+      gap: 7px;
+      padding: 12px;
+      opacity: 0.90;
+      filter: saturate(1.15) contrast(1.05);
+    }
+    #mosaic img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      transform: rotate(var(--rot));
+    }
+
+    /* Lovey overlay: soft glow + hearts */
+    .overlay{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 18% 25%, rgba(255,255,255,0.40), transparent 45%),
+        radial-gradient(circle at 82% 70%, rgba(255,255,255,0.22), transparent 45%),
+        radial-gradient(circle at 50% 92%, rgba(255,255,255,0.14), transparent 55%);
+      mix-blend-mode: screen;
+    }
+
+    .heart{
+      position: fixed;
+      bottom: -40px;
+      font-size: 18px;
+      opacity: 0.85;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,0.10));
+      animation: floatUp linear forwards;
+      pointer-events:none;
+      z-index: 2;
+    }
+    @keyframes floatUp{
+      from{ transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      10%{ opacity: 0.9; }
+      to{ transform: translateY(-115vh) translateX(var(--drift)) scale(var(--scale)); opacity: 0; }
+    }
+
+    /* Floating couple photos (chaos) */
+    .float{
+      position: fixed;
+      width: var(--w);
+      height: calc(var(--w) * 1.25);
+      object-fit: cover;
+      border-radius: 22px;
+      box-shadow: 0 22px 60px var(--shadow);
+      border: 2px solid rgba(255,255,255,0.70);
+      opacity: 0.96;
+      transform: translate3d(var(--x), var(--y), 0) rotate(var(--r));
+      animation: drift var(--dur) ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 3;
+    }
+    @keyframes drift{
+      0% { transform: translate3d(var(--x), var(--y), 0) rotate(var(--r)); }
+      100%{ transform: translate3d(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy)), 0) rotate(calc(var(--r) + var(--dr))); }
+    }
+
+    /* Center card */
+    .cardWrap{
+      position: fixed;
+      inset: 0;
+      display:grid;
+      place-items:center;
+      z-index: 10;
+      pointer-events:none;
+    }
+    .card{
+      pointer-events:auto;
+      width: min(560px, 92vw);
+      padding: 22px 22px 18px;
+      border-radius: 30px;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 2px solid rgba(255,255,255,0.70);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.16);
+      text-align:center;
+
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+      animation: fadeIn 750ms ease forwards;
+    }
+    @keyframes fadeIn{ to{ opacity:1; transform: translateY(0) scale(1);} }
+
+    h1{
+      margin: 0 0 16px;
+      color: var(--text);
+      font-size: clamp(2.1rem, 5.8vw, 3.1rem);
+      letter-spacing: .02em;
+      text-shadow: 0 12px 36px rgba(0,0,0,0.12);
+    }
+
+    .btnRow{
+      display:flex;
+      gap: 14px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    button{
+      border:0;
+      border-radius:999px;
+      padding: 14px 22px;
+      font-size: 1.05rem;
+      cursor:pointer;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+      user-select:none;
+    }
+    button:hover{ transform: translateY(-2px); }
+    button:active{ transform: translateY(1px) scale(.99); }
+
+    #yes{
+      background: linear-gradient(180deg, #ff9ad8, #ff2f9f);
+      color: white;
+      box-shadow: 0 18px 45px rgba(255,47,159,0.25);
+    }
+    #no{
+      background: rgba(255,255,255,0.90);
+      color: var(--text);
+      border: 2px solid rgba(255,47,159,0.22);
+    }
+  </style>
+</head>
+<body>
+  <div id="mosaic" aria-hidden="true"></div>
+  <div class="overlay" aria-hidden="true"></div>
+
+  <div class="cardWrap">
+    <div class="card">
+      <h1>Will you be my valentine?</h1>
+      <div class="btnRow" id="btnRow">
+        <button id="yes">Yes</button>
+        <button id="no">No</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // If alternatives loop happened, remove NO permanently
+    const noDisabled = false;
+    const noBtn = document.getElementById("no");
+    if (noDisabled && noBtn) noBtn.remove();
+
+    // Mosaic background from couple photos 1..11
+    const COUPLE_COUNT = 11;
+    const MOSAIC_TILES = 70;
+    const mosaic = document.getElementById("mosaic");
+    for (let i = 0; i < MOSAIC_TILES; i++) {
+      const n = (i % COUPLE_COUNT) + 1;
+      const img = document.createElement("img");
+      img.src = `${n}.jpg`;
+      img.alt = "";
+      img.style.setProperty("--rot", `${(Math.random()*10 - 5).toFixed(2)}deg`);
+      mosaic.appendChild(img);
+    }
+
+    // Floating couple photos (same style as before)
+    function rand(min,max){ return Math.random()*(max-min)+min; }
+    function addFloater(src){
+      const img = document.createElement("img");
+      img.className = "float";
+      img.src = src;
+      img.alt = "";
+
+      const w = rand(95, 190);
+      const x = rand(-40, window.innerWidth - 60);
+      const y = rand(-40, window.innerHeight - 60);
+      const r = rand(-18, 18);
+      const dx = rand(-120, 120) + "px";
+      const dy = rand(-120, 120) + "px";
+      const dr = rand(-10, 10) + "deg";
+      const dur = rand(4.2, 8.0) + "s";
+
+      img.style.setProperty("--w", w + "px");
+      img.style.setProperty("--x", x + "px");
+      img.style.setProperty("--y", y + "px");
+      img.style.setProperty("--r", r + "deg");
+      img.style.setProperty("--dx", dx);
+      img.style.setProperty("--dy", dy);
+      img.style.setProperty("--dr", dr);
+      img.style.setProperty("--dur", dur);
+
+      document.body.appendChild(img);
+    }
+    const FLOATERS = 18;
+    for (let i = 0; i < FLOATERS; i++){
+      const n = Math.floor(rand(1, COUPLE_COUNT + 1));
+      addFloater(`${n}.jpg`);
+    }
+
+    // Hearts floating (lovey vibe)
+    const heartEmojis = ["💗","💖","💘","💝","💕","💞","💓"];
+    function spawnHeart(){
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+      const size = rand(14, 30);
+      const left = rand(0, 100);
+      const dur = rand(4.5, 8.0);
+      h.style.left = left + "vw";
+      h.style.fontSize = size + "px";
+      h.style.animationDuration = dur + "s";
+      h.style.setProperty("--drift", (rand(-60,60)).toFixed(0) + "px");
+      h.style.setProperty("--scale", rand(0.8, 1.4).toFixed(2));
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), dur*1000);
+    }
+    setInterval(spawnHeart, 260);
+
+    // Buttons
+    document.getElementById("yes").addEventListener("click", () => {
+      window.location.href = "yes.html";
+    });
+
+    // NO should move slowly a few times, but be easy to click
+    if (!noDisabled && noBtn){
+      let movesLeft = 4; // only a few moves
+      function gentleMove(){
+        if (movesLeft <= 0) return;
+        movesLeft--;
+
+        const rect = noBtn.getBoundingClientRect();
+        const pad = 16;
+        const maxX = window.innerWidth - rect.width - pad;
+        const maxY = window.innerHeight - rect.height - pad;
+
+        const x = rand(pad, Math.max(pad, maxX));
+        const y = rand(pad, Math.max(pad, maxY));
+
+        noBtn.style.position = "fixed";
+        noBtn.style.left = x + "px";
+        noBtn.style.top  = y + "px";
+        noBtn.style.zIndex = 20;
+      }
+
+      // move gently on a slow timer and on first hover (but not constantly)
+      setTimeout(gentleMove, 900);
+      setTimeout(gentleMove, 2200);
+      setTimeout(gentleMove, 3600);
+      setTimeout(gentleMove, 5200);
+
+      noBtn.addEventListener("mouseenter", () => {
+        if (movesLeft > 0) gentleMove();
+      });
+
+      // Clicking NO should work easily
+      noBtn.addEventListener("click", () => {
+        window.location.href = "alternatives.html";
+      });
+    }
+  </script>
+</body>
+</html>

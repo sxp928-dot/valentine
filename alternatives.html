@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alternatives</title>
+  <style>
+    :root{
+      --bg1:#ffe6f3; --bg2:#ff4fb0;
+      --glass: rgba(255,255,255,.60);
+      --shadow: rgba(0,0,0,.18);
+      --text:#7a1449;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      background: radial-gradient(circle at 20% 20%, var(--bg1), var(--bg2));
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      display:grid;
+      place-items:center;
+      padding:18px;
+      overflow:hidden;
+    }
+
+    .panel{
+      width:min(980px, 94vw);
+      background: var(--glass);
+      border:2px solid rgba(255,255,255,.70);
+      backdrop-filter: blur(12px);
+      border-radius:28px;
+      box-shadow: 0 20px 60px var(--shadow);
+      padding:18px;
+      text-align:center;
+      animation: fadeIn .6s ease forwards;
+      transform: translateY(14px) scale(.98);
+      opacity:0;
+    }
+    @keyframes fadeIn{ to{ opacity:1; transform: translateY(0) scale(1);} }
+
+    h2{
+      margin: 6px 0 16px;
+      color: var(--text);
+      font-size: clamp(1.5rem, 3.8vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing:.01em;
+      text-shadow: 0 12px 36px rgba(0,0,0,0.10);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(150px, 1fr));
+      gap: 14px;
+    }
+
+    .pick{
+      border-radius: 22px;
+      overflow:hidden;
+      border: 2px solid rgba(255,255,255,.75);
+      box-shadow: 0 16px 45px rgba(0,0,0,.14);
+      cursor:pointer;
+      background: rgba(255,255,255,.35);
+      transition: transform .12s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height: 270px;
+    }
+    .pick:hover{ transform: translateY(-2px) scale(1.01); }
+    .pick:active{ transform: translateY(1px) scale(.99); }
+
+    /* KEY FIX: fit fully (no crop) */
+    .pick img{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;  /* <-- fits entire image */
+      display:block;
+      background: rgba(255,255,255,.22);
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      z-index:100;
+    }
+    .msg{
+      background: rgba(255,255,255,.80);
+      border:2px solid rgba(255,255,255,.75);
+      border-radius:999px;
+      padding: 14px 22px;
+      font-size: 1.2rem;
+      color: var(--text);
+      box-shadow: 0 18px 60px rgba(0,0,0,.18);
+      animation: pop .25s ease;
+    }
+    @keyframes pop{ from{transform:scale(.92);opacity:.35} to{transform:scale(1);opacity:1} }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <h2>Who do you want instead?</h2>
+
+    <section class="grid" id="grid">
+      <div class="pick"><img src="option1.jpg" alt="Option 1"></div>
+      <div class="pick"><img src="option2.jpg" alt="Option 2"></div>
+      <div class="pick"><img src="option3.jpg" alt="Option 3"></div>
+      <div class="pick"><img src="option4.jpg" alt="Option 4"></div>
+    </section>
+  </main>
+
+  <div class="overlay" id="overlay">
+    <div class="msg">try again</div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById("overlay");
+    document.getElementById("grid").addEventListener("click", (e) => {
+      const pick = e.target.closest(".pick");
+      if (!pick) return;
+
+      // After this, NO disappears on the main page
+      localStorage.setItem("no_disabled", "true");
+
+      overlay.style.display = "grid";
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 950);
+    });
+  </script>
+</body>
+</html>
